@@ -39,7 +39,7 @@ namespace Checkout.Tests
             var till = new Till();
 
             // Act
-            new Till().Scan("AB");
+            till.Scan("AB");
             
             // Assert
             Assert.AreEqual(80.0, till.Total());
@@ -60,7 +60,7 @@ namespace Checkout.Tests
             Till till = new Till();
             
             // Act
-            till.Scan("AA"); till.Scan("A");
+            till.Scan("A"); till.Scan("A");
             
             Assert.AreEqual(100, till.Total());
         }
@@ -91,7 +91,7 @@ namespace Checkout.Tests
         }
 
                 [Test]
-        public void Given_TwoAAItems_TotalPrice_ShouldBe_110()
+        public void Given_TwoAAItems_TotalPrice_ShouldBe_100()
         {
             // Arrange
             Till till = new Till();
@@ -100,7 +100,7 @@ namespace Checkout.Tests
             till.Scan("Aa");
             
             // Assert
-            Assert.AreEqual(45, till.Total());
+            Assert.AreEqual(100, till.Total());
         }
     }
 }

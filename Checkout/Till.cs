@@ -10,7 +10,8 @@ namespace Checkout
         private Dictionary<char, int> _items = new Dictionary<char, int>{
             {'A', 0},
             {'B', 0},
-            {'C', 0}
+            {'C', 0},
+            {'D', 0}
         };
 
         public double Total() 
@@ -18,60 +19,65 @@ namespace Checkout
             double total = 0;
             foreach(var item in _items)
             {
-                if(item.Key.Equals('A'))
-                {
-                    total += 50 * item.Value;
+                if(item.Value == 0) continue;
+                else {
+                    switch (item.Key)
+                    {
+                        case 'A':
+                            total = AddItemA(total, item);
+                            continue;
+                        case 'B':
+                            total = AddItemB(total, item);
+                            continue;
+                        case 'C':
+                            total = AddItemC(total, item);
+                            continue;
+                        case 'D':
+                            total = AddItemD(total, item);
+                            continue;
+                        default:
+                            Console.WriteLine("invalid item");
+                            break;
+                    }
                 }
-                else if(item.Key.Equals('B'))
-                {
-                    total += AddB(item.Value.ToString());
-                } 
-                else if(item.Key.Equals('C'))
-                {
-                    total = AddItemC(total, item);
-                }
-                else total = AddItemD(total, item);
-            } 
+            }   
            return total;
         }
-
-static double AddItemD(double total, KeyValuePair<char, int> item)
-{
-    if (item.Key.Equals('D'))
-    {
-        total += 15 * item.Value;
-    }
-
-    return total;
-}
-
-
-        private static double AddItemC(double total, KeyValuePair<char, int> item)
-        {
-            if (item.Key.Equals('C'))
-            {
-                total += 15 * item.Value;
-            }
-
+        private static double AddItemA(double total, KeyValuePair<char, int> item)
+        {   
+            //Use two int variables to determine the number of discounted items and the items with the original price
+            var numberInSpecial =  item.Value / 3;
+            var numberNotInSpecial =  item.Value % 3; 
+            total += 130 * numberInSpecial + 50 * numberNotInSpecial;     
             return total;
         }
 
-        public double AddB(string numberItems)
+        private static double AddItemB(double total, KeyValuePair<char, int> item)
         {
-            double items = Double.Parse(numberItems);
+            var numberInSpecial =  item.Value / 2;
+            var numberNotInSpecial =  item.Value % 2;
+            total += 45 * numberInSpecial + 30 * numberNotInSpecial;  
+            return total;
+        }
 
-            if(items == 0) return 0;
+        private static double AddItemC(double total, KeyValuePair<char, int> item)
+        {
+            //Warn when c items exceeds the maximum
+            if (item.Value > 6) Console.WriteLine("Exceeds the maximum");
+            total += 20 * item.Value; 
+            return total;          
+        }
 
-            var cost = items * 30;
-                var numberOfPairs =  items / 2;
-
-            // discount is 15 on each pair
-            var discount = numberOfPairs * 15;
-            return cost - discount;
+        private static double AddItemD(double total, KeyValuePair<char, int> item)
+        {
+            total += 15 * item.Value;
+            return total;
         }
 
         public void Scan(string items)
         {
+            //Upper the lower cases
+            items = items.ToUpper();
             foreach(var item in items)
             {
                 _items[item]++;  
