@@ -7,6 +7,12 @@ namespace Checkout
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+             // Arrange
+            var till = new Till();
+            
+            // Act
+            till.Scan("AAABBCCCCCCCCCCCCCCCC");
+            till.Total();
         }
     }
 }

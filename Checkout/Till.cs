@@ -6,71 +6,69 @@ namespace Checkout
 {
     public class Till
     {
-
+        // the dictionary contains item quantities
         private Dictionary<char, int> _items = new Dictionary<char, int>{
             {'A', 0},
             {'B', 0},
             {'C', 0},
             {'D', 0}
         };
+        // the dictionary contains item prices
+        private Dictionary<char, int> _itemPrice = new Dictionary<char, int>{
+            {'A', 50},
+            {'B', 30},
+            {'C', 20},
+            {'D', 15}
+        };
+        // the dictionary contains quantity limit for items
+        private Dictionary<char, int> _itemsMaxAmount = new Dictionary<char, int>{
+            {'C', 6}
+        };
+        // the dictionary contains special conditions
+        private Dictionary<char, Tuple<int, int>> _specialSets = new Dictionary<char, Tuple<int, int>>{
+            {'A', Tuple.Create(3,130)},
+            {'B', Tuple.Create(2,45)}
+        };
 
-        public double Total() 
+          public double Total() 
         { 
             double total = 0;
             foreach(var item in _items)
-            {
-                if(item.Value == 0) continue;
-                else {
-                    switch (item.Key)
-                    {
-                        case 'A':
-                            total = AddItemA(total, item);
-                            continue;
-                        case 'B':
-                            total = AddItemB(total, item);
-                            continue;
-                        case 'C':
-                            total = AddItemC(total, item);
-                            continue;
-                        case 'D':
-                            total = AddItemD(total, item);
-                            continue;
-                        default:
-                            Console.WriteLine("invalid item");
-                            break;
-                    }
-                }
-            }   
+            {   
+                // Variables of price and quantity
+                var itemPrice = _itemPrice[item.Key];
+                var itemNum = item.Value;
+                // Warn if an item exceeds max number
+                if(_itemsMaxAmount.ContainsKey(item.Key) && item.Value > _itemsMaxAmount[item.Key]) Console.WriteLine("{0} exceeds the maximum", item.Key);
+                // When the item has special condition and the quantity reaches the minimum requirement
+                if(_specialSets.ContainsKey(item.Key) && item.Value >= _specialSets[item.Key].Item1){  
+                    // The tuple of the special condition for the item 
+                    var specialSet = _specialSets[item.Key] ;
+                    // Add cost for items with special
+                    total = AddItemCostInSpecial(total, itemNum, itemPrice, specialSet);
+                }else {
+                    // Add cost for items with no special
+                    total = AddItemCost(total, itemNum, itemPrice);
+                };    
+            }  
            return total;
+        
         }
-        private static double AddItemA(double total, KeyValuePair<char, int> item)
+        // Item cost with special condition
+        private static double AddItemCostInSpecial(double total, int itemNum,int itemPrice,  Tuple<int, int> special)
         {   
-            //Use two int variables to determine the number of discounted items and the items with the original price
-            var numberInSpecial =  item.Value / 3;
-            var numberNotInSpecial =  item.Value % 3; 
-            total += 130 * numberInSpecial + 50 * numberNotInSpecial;     
+            //caculate the number of discounted items 
+            var numberInSpecial =  itemNum / special.Item1;
+            var numberNotInSpecial =  itemNum % special.Item1; 
+            var specialSetPrice = special.Item2;
+
+            total += specialSetPrice * numberInSpecial + itemPrice * numberNotInSpecial;   
             return total;
         }
-
-        private static double AddItemB(double total, KeyValuePair<char, int> item)
-        {
-            var numberInSpecial =  item.Value / 2;
-            var numberNotInSpecial =  item.Value % 2;
-            total += 45 * numberInSpecial + 30 * numberNotInSpecial;  
-            return total;
-        }
-
-        private static double AddItemC(double total, KeyValuePair<char, int> item)
-        {
-            //Warn when c items exceeds the maximum
-            if (item.Value > 6) Console.WriteLine("Exceeds the maximum");
-            total += 20 * item.Value; 
-            return total;          
-        }
-
-        private static double AddItemD(double total, KeyValuePair<char, int> item)
-        {
-            total += 15 * item.Value;
+        // Item cost with normal condition
+         private static double AddItemCost(double total, int itemNum,int itemPrice)
+        {   
+            total += itemPrice * itemNum;    
             return total;
         }
 
